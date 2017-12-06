@@ -16,9 +16,10 @@ class SimpletestTest < Minitest::Spec
       struct = Struct.new(:a).new
       # assert_equal 11
 
-      test { |struct| assert_equal Struct, struct }
+      test { |struct| assert_equal Struct, 1 }
 
-      test "calling writers mutates" do #|struct|
+      # FIXME: why can this block see struct from the outside?
+      test "calling writers mutates" do |struct|
         struct[:a] = 1
 
         assert_equal( {a: 1},  struct.to_h)
@@ -64,7 +65,7 @@ end
 # i want the order of the tests, because it's a scenario or story to tell - and massively helps when designing APIs. also, reading.
 # i don't want to repeat the first #test setup (eg `struct = Struct.new(:a).new`) in #before just to satisfy the framework. it's not DRY
 # the more indentations, the harder to read
-
+# mixing of @category and before filter
 
 =begin
  the idea in Minitest is that each it block is a method `MyTest#test_01`

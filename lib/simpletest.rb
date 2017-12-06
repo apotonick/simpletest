@@ -10,13 +10,15 @@ require "minitest/spec"
 
 class Simpletest
   # Instance where the assertions for one Simpletest "class" are run.
-  class Test
-    include Minitest::Assertions
-    def assertions
-      @assertions_counter
-    end
-    def assertions=(i)
-      @assertions_counter = i
+  module AssertionAdapter
+    class Minitest
+      include ::Minitest::Assertions
+
+      attr_accessor :assertions # counter for invoked assertions.
+
+      def initialize
+        @assertions = 0
+      end
     end
   end
 
@@ -46,7 +48,12 @@ class Simpletest
     end
 
     # FIXME: where does the assertion backend come from?
-    def assert_equal(*)
+    def assert_equal(*args, &block)
+      adapter = AssertionAdapter::Minitest.new
+      adapter.assert_equal(*args, &block) # FIXME: this sucks: Minitest catches the Assertion exception here, instead of properly passing it up the chain.
+
+      pp adapter
+
       @assertions ||=[]
       @assertions << @description
     end
