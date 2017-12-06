@@ -16,18 +16,20 @@ class SimpletestTest < Minitest::Spec
       struct = Struct.new(:a).new
       # assert_equal 11
 
-      test { |struct| assert_equal Struct, 1 }
+      let(:struct, struct)# { struct }
+
+      test { |struct:| assert_equal Struct, Struct }
 
       # FIXME: why can this block see struct from the outside?
-      test "calling writers mutates" do |struct|
+      test "calling writers mutates" do |struct:|
         struct[:a] = 1
 
         assert_equal( {a: 1},  struct.to_h)
-        assert_equal( [[:a,1]], struct.to_a)
+        assert_equal( [1], struct.to_a)
       end
 
-      test "reader returns value" do |struct|
-        assert_equal 2#, struct[:a]
+      test "reader returns value" do |struct:|
+        assert_equal 2, struct[:a]
       end
     end
   end

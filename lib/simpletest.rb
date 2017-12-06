@@ -30,18 +30,23 @@ class Simpletest
     def initialize(description, block)
       @description, @block = description, block
       @childs = []
+      @locals = {}
     end
 
     def test(description="implement me!", &block) # DSL
       @childs += [Group.new(description, block)]
     end
 
-    def run_childs
-      @childs.collect { |group| group.() }
+    def let(name, value) # TODO: implement block. make value optional.
+      @locals[name] = value
     end
 
-    def call
-      instance_exec(&@block) # todo: call
+    def run_childs
+      @childs.collect { |group| group.( @locals ) }
+    end
+
+    def call(*args)
+      instance_exec(*args, &@block) # todo: call
       results = run_childs
 
       [@assertions, *results]
@@ -53,7 +58,7 @@ class Simpletest
       adapter.assert_equal(*args, &block) # FIXME: this sucks: Minitest catches the Assertion exception here, instead of properly passing it up the chain.
 
       pp adapter
-
+      # instead, there should be an API in Minitest so we can pass it results (failures and passes?) and it "does the rest" .
       @assertions ||=[]
       @assertions << @description
     end
